@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc --sourceMap false --declaration false",
-    "build:watch": "tsc --declaration false --watch"
+    "build:watch": "tsc --watch"
   },
   "keywords": [],
   "author": "",

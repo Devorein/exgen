@@ -2,8 +2,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import ts, { ArrowFunction, Block, CallExpression, ExpressionStatement, Identifier, PropertyAccessExpression, StringLiteral, VariableDeclaration, VariableDeclarationList, VariableStatement } from 'typescript';
 
-const testFilesDirectory = path.resolve(__dirname, '../tests');
-
 function functionChecker(expressionStatement: ExpressionStatement, functionName: string, cb: (describeFunctionCallExpression: CallExpression) => void) {
   function checker(describeFunctionCallExpression: CallExpression) {
     if (describeFunctionCallExpression.kind === 207) {
@@ -48,7 +46,7 @@ function variableChecker(variableStatement: VariableStatement, variableName: str
   }
 }
 
-async function main() {
+export async function generateExamples(testFilesDirectory: string) {
 	const testFiles = await fs.readdir(testFilesDirectory);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
@@ -100,5 +98,3 @@ async function main() {
 		}
 	}
 }
-
-main();

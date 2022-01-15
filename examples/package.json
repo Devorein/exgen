@@ -2,18 +2,21 @@
   "name": "examples",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "doc-gen": "typedoc --plugin typedoc-plugin-markdown --out docs libs/index.ts",
+    "build:watch": "tsc --sourceMap false --declaration false --watch",
+    "examples-gen": "node dist/generate-examples.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "typedoc": "^0.22.10",
+    "typedoc-plugin-markdown": "^3.11.11"
+  },
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "jest": "^27.4.7"
-  },
-  "dependencies": {
-    "typedoc": "^0.22.10"
   }
 }
