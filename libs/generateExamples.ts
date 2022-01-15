@@ -7,7 +7,15 @@ import { FunctionExampleRecord } from "./types";
 export async function generateExamples(moduleMarkdownPath: string, functionExamplesRecord: FunctionExampleRecord, packageName: string) {
   const moduleMarkdownContent = await fs.readFile(moduleMarkdownPath, "utf-8");
   const markdownTree = fromMarkdown(moduleMarkdownContent);
-  for (let index = 0; index < markdownTree.children.length; index++) {
+
+  const slugHeader = markdownTree.children[1];
+  let slug: string = "";
+  if (slugHeader.type === "heading" && slugHeader.depth === 2) {
+    if (slugHeader.children[0].type === "text")
+      slug = slugHeader.children[0].value
+  }
+  // Skip the first 2 nodes as they contain the md slug
+  for (let index = 2; index < markdownTree.children.length; index++) {
     const markdownTreeChildren = markdownTree.children[index];
     // Only h3 are used as function headings
     if (markdownTreeChildren.type === "heading" && markdownTreeChildren.depth === 3) {
@@ -51,7 +59,11 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       }
     }
   }
-  await fs.writeFile(moduleMarkdownPath, toMarkdown(markdownTree, {
+  // Add the slug with the transformed markdown tree
+  await fs.writeFile(moduleMarkdownPath, `---\n${slug}\n---\n` + toMarkdown({
+    type: "root",
+    children: markdownTree.children.slice(2)
+  }, {
     rule: "_"
   }), "utf-8")
 }
