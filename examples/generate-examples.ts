@@ -1,6 +1,11 @@
 import path from "path";
 import { generateExamples } from "typedoc-example-generator";
 
-const testFileDirectory = path.join(__dirname, "tests");
+const testFileDirectory = path.resolve(__dirname, "../tests");
+const modulesMarkdownFilePath = path.resolve(__dirname, "../docs/modules.md");
 
-generateExamples(testFileDirectory);
+async function main() {
+  console.log(await generateExamples(testFileDirectory));
+}
+
+main()
