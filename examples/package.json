@@ -2,7 +2,8 @@
   "name": "examples",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "exports": "./dist/index.js",
+  "type": "module",
   "scripts": {
     "doc-gen": "typedoc --plugin typedoc-plugin-markdown --out docs libs/index.ts",
     "build:watch": "tsc --sourceMap false --declaration false --watch",

@@ -1,1 +1,3 @@
-export * from "./extractExamples";
+export * from "./extractExamples.js";
+export * from "./generateExamples.js";
+

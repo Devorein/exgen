@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import ts, { ArrowFunction, Block, CallExpression, ExpressionStatement, Identifier, PropertyAccessExpression, StringLiteral, VariableDeclaration, VariableDeclarationList, VariableStatement } from 'typescript';
+import { FunctionExampleRecord } from './types';
 
 function functionChecker(expressionStatement: ExpressionStatement, functionName: string, cb: (describeFunctionCallExpression: CallExpression) => void) {
   function checker(describeFunctionCallExpression: CallExpression) {
@@ -49,10 +50,7 @@ function variableChecker(variableStatement: VariableStatement, variableName: str
 export async function extractExamples(testFilesDirectory: string) {
 	const testFiles = await fs.readdir(testFilesDirectory);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-  const functionExamplesRecord: Record<string, {
-    code: string,
-    result: string
-  }> = {};
+  const functionExamplesRecord: FunctionExampleRecord = {};
 	for (let index = 0; index < testFiles.length; index++) {
 		const testFile = testFiles[index];
 		// Make sure its a test.ts file
