@@ -36,7 +36,8 @@ function argumentsChecker(callExpression: ts.CallExpression, cb: (stringArgument
   }
 }
 
-function variableChecker(variableStatement: VariableStatement, variableName: string, cb: (initializer: ts.Expression) => void) {
+// Check if a variable is equal to the passed identifier
+export function variableChecker(variableStatement: VariableStatement, variableName: string, cb: (initializer: ts.Expression) => void) {
   if (variableStatement.kind === 236) {
     const variableDeclarationList = variableStatement.declarationList as VariableDeclarationList;
     if (variableDeclarationList.kind === 254) {
@@ -83,8 +84,8 @@ export async function extractExamples(testFilesDirectory: string) {
               // Make sure the function has been imported in the module
               if (importedFunctions.has(functionName)) {
                 functionExamplesRecord[functionName] = {
-                  code: "",
-                  output: null
+                  statements: [],
+                  logs: []
                 }
                 const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
                 if (describeFunctionBlock.kind === 234) {
@@ -104,9 +105,10 @@ export async function extractExamples(testFilesDirectory: string) {
                               if (itFunctionBlockStatement.kind === 237) {
                                 functionChecker(itFunctionBlockStatement, "expect", (expectFunctionCallExpression) => {
                                   const expectedValue = expectFunctionCallExpression[0].arguments[0];
-                                  functionExamplesRecord[functionName].output = printer.printNode(ts.EmitHint.Unspecified, expectedValue, sourceFile)
-                                  // The last call expression is the `expect` one
-                                  functionExamplesRecord[functionName].code = printer.printNode(ts.EmitHint.Unspecified, expectFunctionCallExpression[expectFunctionCallExpression.length - 1].arguments[0], sourceFile);
+                                  functionExamplesRecord[functionName].logs.push({
+                                    output: printer.printNode(ts.EmitHint.Unspecified, expectedValue, sourceFile),
+                                    arg: printer.printNode(ts.EmitHint.Unspecified, expectFunctionCallExpression[expectFunctionCallExpression.length - 1].arguments[0], sourceFile)
+                                  });
                                 })
                               }
                             }

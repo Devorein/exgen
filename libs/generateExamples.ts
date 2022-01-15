@@ -22,22 +22,29 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       const [textChildNode] = markdownTreeChildren.children;
       // Make sure the function has an example in the record
       if (textChildNode.type === "text" && functionExamplesRecord[textChildNode.value]) {
-        const {code, output} = functionExamplesRecord[textChildNode.value];
+        const {statements, logs} = functionExamplesRecord[textChildNode.value];
         // Move to the defined in header
         for (let innerIndex = index + 1;; innerIndex++) {
           const childNode = markdownTree.children[innerIndex];
           // Find the ### Returns node
           if (childNode?.type === "heading" && childNode.depth === 4) {
             if (childNode.children[0]?.type === "text" && childNode.children[0].value === "Defined in") {
+              const exampleCode: string[] = [`import { ${textChildNode.value} } from "${packageName}";\n`];
+              if(statements.length) {
+                exampleCode.push(statements.join('\n'))
+              }
+
+              exampleCode.push(logs.map(({arg}) => `console.log(${arg});`).join("\n"))
+
               const codeUsageNode: Code = {
                 type: "code",
-                value: `import { ${textChildNode.value} } from "${packageName}";\n\n${code};`,
+                value: exampleCode.join("\n"),
                 lang: "ts",
               }, 
               // Only create node if output is not empty
-              codeResultNode: Code | null = output ? {
+              codeResultNode: Code | null = logs.length ? {
                 type: "code",
-                value: output,
+                value: logs.map(({arg, output}) => `// ${arg}\n${output}`).join("\n"),
                 lang: "json"
               } : null, headerNode: Heading = {
                 depth: 4,
