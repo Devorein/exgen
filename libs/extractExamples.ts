@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import ts, { ArrowFunction, Block, CallExpression, ExpressionStatement, Identifier, PropertyAccessExpression, StringLiteral, VariableDeclaration, VariableDeclarationList, VariableStatement } from 'typescript';
+import ts, { ArrowFunction, Block, CallExpression, ExpressionStatement, Identifier, ImportDeclaration, NamedImportBindings, PropertyAccessExpression, StringLiteral, VariableDeclaration, VariableDeclarationList, VariableStatement } from 'typescript';
 import { FunctionExampleRecord } from './types';
 
 function functionChecker(expressionStatement: ExpressionStatement, functionName: string, cb: (describeFunctionCallExpression: CallExpression) => void) {
@@ -51,6 +51,7 @@ export async function extractExamples(testFilesDirectory: string) {
 	const testFiles = await fs.readdir(testFilesDirectory);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
   const functionExamplesRecord: FunctionExampleRecord = {};
+  
 	for (let index = 0; index < testFiles.length; index++) {
 		const testFile = testFiles[index];
 		// Make sure its a test.ts file
@@ -58,48 +59,64 @@ export async function extractExamples(testFilesDirectory: string) {
 			const testFilePath = path.join(testFilesDirectory, testFile);
       const program = ts.createProgram([testFilePath], {});
 			const sourceFile = program.getSourceFile(testFilePath)!;
+      const importedFunctions: Set<string> = new Set();
       for (let index = 0; index < sourceFile.statements.length; index++) {
-        const statement = sourceFile.statements[index] as ExpressionStatement;
-        functionChecker(statement, "describe", (describeFunctionCallExpression) => {
-          argumentsChecker(describeFunctionCallExpression, (describeFunctionFirstArgument, describeFunctionSecondArgument) => {
-            const functionName = describeFunctionFirstArgument.text;
-            functionExamplesRecord[functionName] = {
-              code: "",
-              result: ""
+        const statement = sourceFile.statements[index] as ExpressionStatement | ImportDeclaration;
+        if (statement.kind === 265) {
+          if (statement.importClause) {
+            const namedImports = statement.importClause.namedBindings as NamedImportBindings;
+            if (namedImports.kind === 268) {
+              const importSpecifiers = namedImports.elements;
+              importSpecifiers.forEach(importSpecifier => {
+                importedFunctions.add(importSpecifier.name.escapedText as string)
+              })
             }
-            const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
-            if (describeFunctionBlock.kind === 234) {
-              // Loop through all the `it` function statements
-              // And see which `it` has the same first argument as describe
-              for (let index = 0; index < describeFunctionBlock.statements.length; index++) {
-                const describeFunctionBlockStatement = describeFunctionBlock.statements[index] as ExpressionStatement;
-                functionChecker(describeFunctionBlockStatement, "it", (itFunctionCallExpression) => {
-                  // Only if the first argument of it and describe are the same
-                  argumentsChecker(itFunctionCallExpression, (itFunctionFirstArgument, itFunctionSecondArgument) => {
-                    if (itFunctionFirstArgument.text === functionName) {
-                      const itFunctionBlock = itFunctionSecondArgument.body as Block;
-                      if (itFunctionBlock.kind === 234) {
-                        // Find the expect function call
-                        for (let index = 0; index < itFunctionBlock.statements.length; index++) {
-                          const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement | VariableStatement;
-                          if (itFunctionBlockStatement.kind === 236) {
-                            variableChecker(itFunctionBlockStatement, "expected", (variableInitializer) => {
-                              functionExamplesRecord[functionName].result = printer.printNode(ts.EmitHint.Unspecified, variableInitializer, sourceFile)
-                            })
-                          } else {
-                            functionChecker(itFunctionBlockStatement, "expect", (expectFunctionCallExpression) => {
-                              functionExamplesRecord[functionName].code = printer.printNode(ts.EmitHint.Unspecified, expectFunctionCallExpression.arguments[0], sourceFile);
-                            })
+          }
+        } else {
+          functionChecker(statement, "describe", (describeFunctionCallExpression) => {
+            argumentsChecker(describeFunctionCallExpression, (describeFunctionFirstArgument, describeFunctionSecondArgument) => {
+              const functionName = describeFunctionFirstArgument.text;
+              // Make sure the function has been imported in the module
+              if (importedFunctions.has(functionName)) {
+                functionExamplesRecord[functionName] = {
+                  code: "",
+                  result: ""
+                }
+                const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
+                if (describeFunctionBlock.kind === 234) {
+                  // Loop through all the `it` function statements
+                  // And see which `it` has the same first argument as describe
+                  for (let index = 0; index < describeFunctionBlock.statements.length; index++) {
+                    const describeFunctionBlockStatement = describeFunctionBlock.statements[index] as ExpressionStatement;
+                    functionChecker(describeFunctionBlockStatement, "it", (itFunctionCallExpression) => {
+                      // Only if the first argument of it and describe are the same
+                      argumentsChecker(itFunctionCallExpression, (itFunctionFirstArgument, itFunctionSecondArgument) => {
+                        if (itFunctionFirstArgument.text === functionName) {
+                          const itFunctionBlock = itFunctionSecondArgument.body as Block;
+                          if (itFunctionBlock.kind === 234) {
+                            // Find the expect function call
+                            for (let index = 0; index < itFunctionBlock.statements.length; index++) {
+                              const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement | VariableStatement;
+                              if (itFunctionBlockStatement.kind === 236) {
+                                variableChecker(itFunctionBlockStatement, "expected", (variableInitializer) => {
+                                  functionExamplesRecord[functionName].result = printer.printNode(ts.EmitHint.Unspecified, variableInitializer, sourceFile)
+                                })
+                              } else {
+                                functionChecker(itFunctionBlockStatement, "expect", (expectFunctionCallExpression) => {
+                                  functionExamplesRecord[functionName].code = printer.printNode(ts.EmitHint.Unspecified, expectFunctionCallExpression.arguments[0], sourceFile);
+                                })
+                              }
+                            }
                           }
                         }
-                      }
-                    }
-                  })
-                })
+                      })
+                    })
+                  }
+                }
               }
-            }
+            })
           })
-        })
+        }
       }
 		}
 	}

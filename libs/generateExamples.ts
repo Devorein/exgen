@@ -24,7 +24,7 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
               const codeUsageNode: Code = {
                 type: "code",
                 value: `import { ${textChildNode.value} } from "${packageName}";\n\n${code}`,
-                lang: "typescript",
+                lang: "ts",
               }, codeResultNode: Code = {
                 type: "code",
                 value: result,
@@ -51,5 +51,7 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       }
     }
   }
-  await fs.writeFile(moduleMarkdownPath, toMarkdown(markdownTree), "utf-8")
+  await fs.writeFile(moduleMarkdownPath, toMarkdown(markdownTree, {
+    rule: "_"
+  }), "utf-8")
 }
