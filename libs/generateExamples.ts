@@ -22,22 +22,24 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       const [textChildNode] = markdownTreeChildren.children;
       // Make sure the function has an example in the record
       if (textChildNode.type === "text" && functionExamplesRecord[textChildNode.value]) {
-        const {code, result} = functionExamplesRecord[textChildNode.value];
+        const {code, output} = functionExamplesRecord[textChildNode.value];
         // Move to the defined in header
         for (let innerIndex = index + 1;; innerIndex++) {
           const childNode = markdownTree.children[innerIndex];
           // Find the ### Returns node
-          if (childNode.type === "heading" && childNode.depth === 4) {
+          if (childNode?.type === "heading" && childNode.depth === 4) {
             if (childNode.children[0]?.type === "text" && childNode.children[0].value === "Defined in") {
               const codeUsageNode: Code = {
                 type: "code",
-                value: `import { ${textChildNode.value} } from "${packageName}";\n\n${code}`,
+                value: `import { ${textChildNode.value} } from "${packageName}";\n\n${code};`,
                 lang: "ts",
-              }, codeResultNode: Code = {
+              }, 
+              // Only create node if output is not empty
+              codeResultNode: Code | null = output ? {
                 type: "code",
-                value: result,
-                lang: "sh"
-              }, headerNode: Heading = {
+                value: output,
+                lang: "json"
+              } : null, headerNode: Heading = {
                 depth: 4,
                 type: "heading",
                 children: [
@@ -47,14 +49,29 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
                   }
                 ]
               }
-              markdownTree.children.splice(innerIndex, 0, codeResultNode);
+
+              // Adding new nodes from bottom up
+              // Only add node if its not null
+              if (codeResultNode) {
+                markdownTree.children.splice(innerIndex, 0, codeResultNode);
+              }
               markdownTree.children.splice(innerIndex, 0, codeUsageNode);
               markdownTree.children.splice(innerIndex, 0, headerNode);
               // Set the index, to skip the visited nodes, along with the inserted ones
-              index = innerIndex + 3;
+              index = innerIndex + (codeResultNode ? 3 : 2);
               break;
             }
-          }
+            // Remove the previous examples
+            else if (childNode.children[0]?.type === "text" && childNode.children[0].value === "Example") {
+              // Some example might not have output, so check if the 3rd node is code and json
+              if (markdownTree.children[innerIndex + 2].type === "code" && (markdownTree.children[innerIndex + 2] as Code).lang === "json") {
+                markdownTree.children.splice(innerIndex, 3);
+              } else {
+                markdownTree.children.splice(innerIndex, 2);
+              }
+              innerIndex-=1;
+            }
+          } 
         }
       }
     }

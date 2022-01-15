@@ -80,7 +80,7 @@ export async function extractExamples(testFilesDirectory: string) {
               if (importedFunctions.has(functionName)) {
                 functionExamplesRecord[functionName] = {
                   code: "",
-                  result: ""
+                  output: null
                 }
                 const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
                 if (describeFunctionBlock.kind === 234) {
@@ -99,7 +99,7 @@ export async function extractExamples(testFilesDirectory: string) {
                               const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement | VariableStatement;
                               if (itFunctionBlockStatement.kind === 236) {
                                 variableChecker(itFunctionBlockStatement, "expected", (variableInitializer) => {
-                                  functionExamplesRecord[functionName].result = printer.printNode(ts.EmitHint.Unspecified, variableInitializer, sourceFile)
+                                  functionExamplesRecord[functionName].output = printer.printNode(ts.EmitHint.Unspecified, variableInitializer, sourceFile)
                                 })
                               } else {
                                 functionChecker(itFunctionBlockStatement, "expect", (expectFunctionCallExpression) => {
