@@ -107,7 +107,7 @@ export async function extractExamples(testFilesDirectory: string) {
                           if (itFunctionBlock.kind === 234) {
                             for (let index = 0; index < itFunctionBlock.statements.length; index++) {
                               const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement;
-                              // If its a call expression
+                              // If its a function call expression
                               if (itFunctionBlockStatement.kind === 237) {
                                 // Find the expect function call
                                 const expectFunctionStatement = functionChecker(itFunctionBlockStatement, "expect");

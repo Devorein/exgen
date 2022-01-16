@@ -2,7 +2,7 @@
 import { makeDouble } from '../libs/makeDouble';
 
 describe('makeDouble', () => {
-	it(`makeDouble`, () => {
+	it(``, () => {
 		const doubled = makeDouble(1);
     expect(
 			doubled

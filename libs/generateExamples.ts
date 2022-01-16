@@ -1,12 +1,17 @@
 import fs from "fs/promises";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { Code, Heading } from "mdast-util-from-markdown/lib";
+import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
 import { toMarkdown } from "mdast-util-to-markdown";
+import { gfmTable } from 'micromark-extension-gfm-table';
 import { FunctionExampleRecord } from "./types";
 
 export async function generateExamples(moduleMarkdownPath: string, functionExamplesRecord: FunctionExampleRecord, packageName: string) {
   const moduleMarkdownContent = await fs.readFile(moduleMarkdownPath, "utf-8");
-  const markdownTree = fromMarkdown(moduleMarkdownContent);
+  const markdownTree = fromMarkdown(moduleMarkdownContent, {
+    extensions: [gfmTable],
+    mdastExtensions: [gfmTableFromMarkdown]
+  });
 
   const slugHeader = markdownTree.children[1];
   let slug: string = "";
@@ -38,13 +43,13 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
 
               const codeUsageNode: Code = {
                 type: "code",
-                value: exampleCode.join("\n"),
+                value: exampleCode.join("\n\n"),
                 lang: "ts",
               }, 
               // Only create node if output is not empty
               codeResultNode: Code | null = logs.length ? {
                 type: "code",
-                value: logs.map(({arg, output}) => `// ${arg}\n${output}`).join("\n"),
+                value: logs.map(({arg, output}) => `// ${arg}\n${output}`).join("\n\n"),
                 lang: "json"
               } : null, headerNode: Heading = {
                 depth: 4,
@@ -83,11 +88,13 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       }
     }
   }
+  
   // Add the slug with the transformed markdown tree
   await fs.writeFile(moduleMarkdownPath, `---\n${slug}\n---\n` + toMarkdown({
     type: "root",
     children: markdownTree.children.slice(2)
   }, {
-    rule: "_"
+    rule: "_",
+    extensions: [gfmTableToMarkdown()]
   }), "utf-8")
 }
