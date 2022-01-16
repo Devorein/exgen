@@ -50,7 +50,7 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
 
               const codeExampleHtmlNode: HTML = {
                 type: "html",
-                value: [`<div id="${textChildNode.value}" className="code-container">`, `\t<CodeBlock className="language-ts code-block" content={\`${exampleCode.join("\\n")}\`}/>`, `\t<CodeBlock className="language-ts code-block" content={\`${logs.map(({arg, output}) => `// ${normalizeString(arg)}\\n${normalizeString(output)}`).join("\\n")}\`}/>`, "</div>"].join("\n"),
+                value: [`<div id="${textChildNode.value}" className="code-container">`, `\t<CodeBlock className="language-ts code-block">`, `{\`${exampleCode.join("\\n")}\`}`, "</CodeBlock>", `\t<CodeBlock className="language-ts code-block">`, `{\`${logs.map(({arg, output}) => `// ${normalizeString(arg)}\\n${normalizeString(output)}`).join("\\n")}\`}`, "</CodeBlock>", "</div>"].join("\n"),
               }, 
               headerNode: Heading = {
                 depth: 4,
