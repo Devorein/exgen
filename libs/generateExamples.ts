@@ -1,24 +1,20 @@
 import fs from "fs/promises";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { Code, Heading } from "mdast-util-from-markdown/lib";
+import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter';
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
 import { toMarkdown } from "mdast-util-to-markdown";
+import { frontmatter } from 'micromark-extension-frontmatter';
 import { gfmTable } from 'micromark-extension-gfm-table';
 import { FunctionExampleRecord } from "./types";
 
 export async function generateExamples(moduleMarkdownPath: string, functionExamplesRecord: FunctionExampleRecord, packageName: string) {
   const moduleMarkdownContent = await fs.readFile(moduleMarkdownPath, "utf-8");
   const markdownTree = fromMarkdown(moduleMarkdownContent, {
-    extensions: [gfmTable],
-    mdastExtensions: [gfmTableFromMarkdown]
+    extensions: [gfmTable, frontmatter(['toml', 'yaml'])],
+    mdastExtensions: [gfmTableFromMarkdown, frontmatterFromMarkdown(['yaml', 'toml'])]
   });
 
-  const slugHeader = markdownTree.children[1];
-  let slug: string = "";
-  if (slugHeader.type === "heading" && slugHeader.depth === 2) {
-    if (slugHeader.children[0].type === "text")
-      slug = slugHeader.children[0].value
-  }
   // Skip the first 2 nodes as they contain the md slug
   for (let index = 2; index < markdownTree.children.length; index++) {
     const markdownTreeChildren = markdownTree.children[index];
@@ -90,11 +86,11 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
   }
   
   // Add the slug with the transformed markdown tree
-  await fs.writeFile(moduleMarkdownPath, `---\n${slug}\n---\n` + toMarkdown({
+  await fs.writeFile(moduleMarkdownPath, toMarkdown({
     type: "root",
     children: markdownTree.children.slice(2)
   }, {
     rule: "_",
-    extensions: [gfmTableToMarkdown()]
+    extensions: [gfmTableToMarkdown(), frontmatterToMarkdown(['yaml', 'toml'])]
   }), "utf-8")
 }
