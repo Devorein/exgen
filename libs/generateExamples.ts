@@ -30,7 +30,7 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
           // Find the ### Returns node
           if (childNode?.type === "heading" && childNode.depth === 4) {
             if (childNode.children[0]?.type === "text" && childNode.children[0].value === "Defined in") {
-              const exampleCode: string[] = [`import { ${textChildNode.value} } from "${packageName}";\n`];
+              const exampleCode: string[] = [`import { ${textChildNode.value} } from "${packageName}";`];
               if(statements.length) {
                 exampleCode.push(statements.join('\n'))
               }

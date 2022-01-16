@@ -1,5 +1,5 @@
 /// <reference types="@types/jest"/>
-import { deleteKeys } from '../libs/deleteKeys';
+import { deleteKeys } from '../../libs/deleteKeys';
 
 describe('deleteKeys', () => {
 	it(`deleteKeys`, () => {
