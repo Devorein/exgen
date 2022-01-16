@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import ts, { ArrowFunction, Block, CallExpression, ExpressionStatement, Identifier, ImportDeclaration, NamedImportBindings, PropertyAccessExpression, StringLiteral, VariableDeclaration, VariableDeclarationList, VariableStatement } from 'typescript';
-import { FunctionExampleRecord } from './types';
+import { ExampleInfo, FunctionExampleRecord } from './types';
 
 function functionChecker(expressionStatement: ExpressionStatement, functionName: string) {
   function checker(functionCallExpressions: CallExpression[]): CallExpression[] | null {
@@ -95,8 +95,7 @@ export async function extractExamples(testFilesDirectory: string) {
                     
                     const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
                     if (describeFunctionBlock.kind === 234) {
-                      // Loop through all the `it` function statements
-                      // And see which `it` has the same first argument as describe
+                      // Loop through all the function block statements
                       for (let index = 0; index < describeFunctionBlock.statements.length; index++) {
                         const describeFunctionBlockStatement = describeFunctionBlock.statements[index] as ExpressionStatement;
                         const itFunctionStatement = functionChecker(describeFunctionBlockStatement, "it");
@@ -104,32 +103,41 @@ export async function extractExamples(testFilesDirectory: string) {
                         if (itFunctionStatement) {
                           // Only if the first argument of it and describe are the same
                           argumentsChecker(itFunctionStatement[0], (itFunctionFirstArgument, itFunctionSecondArgument) => {
-                            if (itFunctionFirstArgument.text === functionName) {
-                              functionExamplesRecord[functionName] = {
-                                statements: [],
-                                logs: []
-                              }
-                              const itFunctionBlock = itFunctionSecondArgument.body as Block;
-                              if (itFunctionBlock.kind === 234) {
-                                for (let index = 0; index < itFunctionBlock.statements.length; index++) {
-                                  const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement;
-                                  // If its a function call expression
-                                  if (itFunctionBlockStatement.kind === 237) {
-                                    // Find the expect function call
-                                    const expectFunctionStatement = functionChecker(itFunctionBlockStatement, "expect");
-                                    if (expectFunctionStatement) {
-                                      const expectedValue = expectFunctionStatement[0].arguments[0];
-                                      functionExamplesRecord[functionName].logs.push({
-                                        output: printer.printNode(ts.EmitHint.Unspecified, expectedValue, sourceFile),
-                                        arg: printer.printNode(ts.EmitHint.Unspecified, expectFunctionStatement[expectFunctionStatement.length - 1].arguments[0], sourceFile)
-                                      });
-                                    } else {
-                                      functionExamplesRecord[functionName].statements.push(printer.printNode(ts.EmitHint.Unspecified, itFunctionBlockStatement, sourceFile))
-                                    }
+                            const exampleMessage = itFunctionFirstArgument.text;
+                            const exampleInfo: ExampleInfo = {
+                              logs: [],
+                              message: exampleMessage,
+                              statements: []
+                            }
+                            const itFunctionBlock = itFunctionSecondArgument.body as Block;
+                            if (itFunctionBlock.kind === 234) {
+                              for (let index = 0; index < itFunctionBlock.statements.length; index++) {
+                                const itFunctionBlockStatement = itFunctionBlock.statements[index] as ExpressionStatement;
+                                // If its a function call expression
+                                if (itFunctionBlockStatement.kind === 237) {
+                                  // Find the expect function call
+                                  const expectFunctionStatement = functionChecker(itFunctionBlockStatement, "expect");
+                                  if (expectFunctionStatement) {
+                                    const expectedValue = expectFunctionStatement[0].arguments[0];
+                                    exampleInfo.logs.push({
+                                      output: printer.printNode(ts.EmitHint.Unspecified, expectedValue, sourceFile),
+                                      arg: printer.printNode(ts.EmitHint.Unspecified, expectFunctionStatement[expectFunctionStatement.length - 1].arguments[0], sourceFile)
+                                    });
                                   } else {
-                                    functionExamplesRecord[functionName].statements.push(printer.printNode(ts.EmitHint.Unspecified, itFunctionBlockStatement, sourceFile))
+                                    exampleInfo.statements.push(printer.printNode(ts.EmitHint.Unspecified, itFunctionBlockStatement, sourceFile))
                                   }
+                                } else {
+                                  // Add all the extra block statements 
+                                  exampleInfo.statements.push(printer.printNode(ts.EmitHint.Unspecified, itFunctionBlockStatement, sourceFile))
                                 }
+                              }
+                              // Add the example info corresponding to the function name
+                              if (!functionExamplesRecord[functionName]) {
+                                functionExamplesRecord[functionName] = [
+                                  exampleInfo
+                                ]
+                              } else {
+                                functionExamplesRecord[functionName].push(exampleInfo)
                               }
                             }
                           })

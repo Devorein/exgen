@@ -32,27 +32,30 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
       const [textChildNode] = markdownTreeChildren.children;
       // Make sure the function has an example in the record
       if (textChildNode.type === "text" && functionExamplesRecord[textChildNode.value]) {
-        const {statements, logs} = functionExamplesRecord[textChildNode.value];
-        // Move to the defined in header
         for (let innerIndex = index + 1;; innerIndex++) {
           const childNode = markdownTree.children[innerIndex];
-          // Find the ### Returns node
           if (childNode?.type === "heading" && childNode.depth === 4) {
             if (childNode.children[0]?.type === "text" && childNode.children[0].value === "Defined in") {
-              const exampleCode: string[] = [`import { ${textChildNode.value} } from "${packageName}";\\n`];
-              statements.forEach(statement => {
-                exampleCode.push(normalizeString(statement))
+              const exampleInfos = functionExamplesRecord[textChildNode.value];
+              exampleInfos.forEach(({statements, logs, message}, exampleInfoIndex) => {
+                const exampleCode: string[] = [`import { ${textChildNode.value} } from "${packageName}";\\n`];
+                statements.forEach(statement => {
+                  exampleCode.push(normalizeString(statement))
+                })
+  
+                logs.forEach(({arg}) => {
+                  exampleCode.push(`console.log(${normalizeString(arg)});`)
+                })
+  
+                const codeExampleHtmlNode: HTML = {
+                  type: "html",
+                  value: [`##### ${message}`,`<div id="${textChildNode.value}-example-${exampleInfoIndex}" className="code-container">`, `\t<CodeBlock className="language-ts code-block">`, `{\`${exampleCode.join("\\n")}\`}`, "</CodeBlock>", `\t<CodeBlock className="language-ts code-block">`, `{\`${logs.map(({arg, output}) => `// ${normalizeString(arg)}\\n${normalizeString(output)}`).join("\\n")}\`}`, "</CodeBlock>", "</div>"].join("\n"),
+                }
+  
+                markdownTree.children.splice(innerIndex, 0, codeExampleHtmlNode);
               })
 
-              logs.forEach(({arg}) => {
-                exampleCode.push(`console.log(${normalizeString(arg)});`)
-              })
-
-              const codeExampleHtmlNode: HTML = {
-                type: "html",
-                value: [`<div id="${textChildNode.value}" className="code-container">`, `\t<CodeBlock className="language-ts code-block">`, `{\`${exampleCode.join("\\n")}\`}`, "</CodeBlock>", `\t<CodeBlock className="language-ts code-block">`, `{\`${logs.map(({arg, output}) => `// ${normalizeString(arg)}\\n${normalizeString(output)}`).join("\\n")}\`}`, "</CodeBlock>", "</div>"].join("\n"),
-              }, 
-              headerNode: Heading = {
+              const headerNode: Heading = {
                 depth: 4,
                 type: "heading",
                 children: [
@@ -63,10 +66,9 @@ export async function generateExamples(moduleMarkdownPath: string, functionExamp
                 ]
               }
 
-              markdownTree.children.splice(innerIndex, 0, codeExampleHtmlNode);
               markdownTree.children.splice(innerIndex, 0, headerNode);
               // Set the index, to skip the visited nodes, along with the inserted ones
-              index = innerIndex + 2;
+              index = innerIndex + 1 + exampleInfos.length;
               break;
             }
           } 

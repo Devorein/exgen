@@ -2,7 +2,14 @@
 import { makeDouble } from '../libs/makeDouble';
 
 describe('makeDouble', () => {
-	it(``, () => {
+	it(`Convert to double 1`, () => {
+		const doubled = makeDouble(1);
+    expect(
+			doubled
+		).toStrictEqual(2);
+	});
+
+  it(`Convert to double 2`, () => {
 		const doubled = makeDouble(1);
     expect(
 			doubled
