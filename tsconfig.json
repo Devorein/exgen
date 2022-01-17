@@ -4,6 +4,7 @@
     "lib": [
       "ES2018"
     ],
+    "module": "CommonJS",
     "strict": false,
     "skipLibCheck": true,
     "sourceMap": true,

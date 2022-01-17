@@ -2,7 +2,7 @@
   "name": "typedoc-example-generator",
   "version": "1.0.0",
   "description": "Generate examples of your api using pre-written tests",
-  "exports": "./dist/index.js",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "start": "node dist/index.js",

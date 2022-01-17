@@ -1,11 +1,14 @@
 import fs from 'fs/promises';
-import { fromMarkdown } from 'mdast-util-from-markdown';
-import { Heading, HTML } from 'mdast-util-from-markdown/lib';
-import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter';
-import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { frontmatter } from 'micromark-extension-frontmatter';
-import { gfmTable } from 'micromark-extension-gfm-table';
+import fromMarkdown from 'mdast-util-from-markdown';
+// @ts-ignore
+import frontmatterUtil from 'mdast-util-frontmatter';
+// @ts-ignore
+import gfmTableUtil from 'mdast-util-gfm-table';
+import toMarkdown from 'mdast-util-to-markdown';
+// @ts-ignore
+import frontMatter from 'micromark-extension-frontmatter';
+// @ts-ignore
+import gfmTable from 'micromark-extension-gfm-table';
 import { FunctionExampleRecord } from './types';
 
 function normalizeString(inputString: string) {
@@ -19,8 +22,8 @@ export async function generateExamples(
 ) {
 	const moduleMarkdownContent = await fs.readFile(moduleMarkdownPath, 'utf-8');
 	const markdownTree = fromMarkdown(moduleMarkdownContent, {
-		extensions: [gfmTable, frontmatter(['toml', 'yaml'])],
-		mdastExtensions: [gfmTableFromMarkdown, frontmatterFromMarkdown(['yaml', 'toml'])],
+		extensions: [gfmTable, frontMatter({ type: 'yaml', marker: '-' })],
+		mdastExtensions: [gfmTableUtil.fromMarkdown, frontmatterUtil.fromMarkdown(['yaml', 'toml'])],
 	});
 
 	markdownTree.children.splice(1, 0, {
@@ -56,7 +59,7 @@ export async function generateExamples(
 									exampleCode.push(`console.log(${normalizeString(arg)});`);
 								});
 
-								const codeExampleHtmlNode: HTML = {
+								const codeExampleHtmlNode = {
 									type: 'html',
 									value: [
 										`##### ${message}`,
@@ -74,12 +77,12 @@ export async function generateExamples(
 										'</CodeBlock>',
 										'</div>',
 									].join('\n'),
-								};
+								} as const;
 
 								markdownTree.children.splice(innerIndex, 0, codeExampleHtmlNode);
 							});
 
-							const headerNode: Heading = {
+							const headerNode = {
 								depth: 4,
 								type: 'heading',
 								children: [
@@ -88,7 +91,7 @@ export async function generateExamples(
 										value: 'Example',
 									},
 								],
-							};
+							} as any;
 
 							markdownTree.children.splice(innerIndex, 0, headerNode);
 							// Set the index, to skip the visited nodes, along with the inserted ones
@@ -108,10 +111,10 @@ export async function generateExamples(
 			{
 				type: 'root',
 				children: markdownTree.children,
-			},
+			} as any,
 			{
 				rule: '_',
-				extensions: [gfmTableToMarkdown(), frontmatterToMarkdown(['yaml', 'toml'])],
+				extensions: [gfmTableUtil.toMarkdown(), frontmatterUtil.toMarkdown(['yaml', 'toml'])],
 			}
 		),
 		'utf-8'
