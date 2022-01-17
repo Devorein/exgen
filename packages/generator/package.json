@@ -1,5 +1,5 @@
 {
-  "name": "doc-example-generator",
+  "name": "@xgen/generator",
   "version": "0.0.1",
   "description": "Generate examples of your api using pre-written unit tests",
   "main": "./dist/index.js",
@@ -18,8 +18,7 @@
     "mdast-util-gfm-table": "0.1.6",
     "mdast-util-to-markdown": "0.6.5",
     "micromark-extension-frontmatter": "0.2.2",
-    "micromark-extension-gfm-table": "0.4.3",
-    "typescript": "^4.5.4"
+    "micromark-extension-gfm-table": "0.4.3"
   },
   "devDependencies": {
     "@types/node": "^17.0.9"

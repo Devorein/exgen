@@ -1,0 +1,20 @@
+{
+  "name": "@xgen/extractor",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc --sourceMap false --declaration false",
+    "build:watch": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "typescript": "^4.0.0"
+  },
+  "dependencies": {
+    "@types/node": "^17.0.9"
+  }
+}

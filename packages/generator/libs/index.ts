@@ -27,8 +27,13 @@ export async function generateExamples(
 	});
 
 	markdownTree.children.splice(1, 0, {
-		type: 'html',
-		value: `import CodeBlock from "@theme/CodeBlock";`,
+		type: 'paragraph',
+		children: [
+			{
+				type: 'text',
+				value: `import CodeBlock from "@theme/CodeBlock";`,
+			},
+		],
 	});
 
 	// Skip first node since its the slug
@@ -67,7 +72,7 @@ export async function generateExamples(
 										`\t<CodeBlock className="language-ts code-block">`,
 										`{\`${exampleCode.join('\\n')}\`}`,
 										'</CodeBlock>',
-										`\t<CodeBlock className="language-ts code-block">`,
+										`\t<CodeBlock className="language-json code-block">`,
 										`{\`${logs
 											.map(
 												({ arg, output }) =>
