@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import fromMarkdown from 'mdast-util-from-markdown';
 // @ts-ignore
 import frontmatterUtil from 'mdast-util-frontmatter';
@@ -20,7 +20,7 @@ export async function generateExamples(
 	functionExamplesRecord: FunctionExampleRecord,
 	packageName: string
 ) {
-	const moduleMarkdownContent = await fs.readFile(moduleMarkdownPath, 'utf-8');
+	const moduleMarkdownContent = await readFile(moduleMarkdownPath, 'utf-8');
 	const markdownTree = fromMarkdown(moduleMarkdownContent, {
 		extensions: [gfmTable, frontMatter({ type: 'yaml', marker: '-' })],
 		mdastExtensions: [gfmTableUtil.fromMarkdown, frontmatterUtil.fromMarkdown(['yaml', 'toml'])],
@@ -105,7 +105,7 @@ export async function generateExamples(
 	}
 
 	// Add the slug with the transformed markdown tree
-	await fs.writeFile(
+	await writeFile(
 		moduleMarkdownPath,
 		toMarkdown(
 			{
