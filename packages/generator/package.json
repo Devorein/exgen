@@ -8,8 +8,6 @@
     "prebuild": "del-cli ./dist",
     "build": "tsc --sourceMap false",
     "build:watch": "tsc -w",
-    "start": "node dist/index.js",
-    "start:watch": "nodemon dist/index.js",
     "lint": "eslint \"./libs\" --ext tsx,ts",
     "lint:fix": "eslint \"./libs\" --ext tsx,ts --fix",
     "test": "jest --runInBand --config ./jest.config.js",

@@ -1,18 +1,22 @@
 {
-  "name": "typedoc-example-generator",
+  "name": "xgen",
   "version": "1.0.0",
   "description": "Generate examples of your api using pre-written tests",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc --sourceMap false --declaration false",
-    "build:watch": "tsc --watch"
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "format": "lerna run format",
+    "build:watch": "lerna run build:watch --parallel",
+    "bootstrap": "lerna bootstrap"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lerna": "^4.0.0",
     "mdast-util-from-markdown": "0.8.5",
     "mdast-util-frontmatter": "0.2.0",
     "mdast-util-gfm-table": "0.1.6",
