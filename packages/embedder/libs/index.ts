@@ -15,7 +15,7 @@ function normalizeString(inputString: string) {
 	return inputString.replace(/`/g, '\\`').replace(/\\n/g, '\\\\n').split('\n').join('\\n');
 }
 
-export async function generateExamples(
+export async function embedExamples(
 	moduleMarkdownPath: string,
 	functionExamplesRecord: FunctionExampleRecord,
 	packageName: string

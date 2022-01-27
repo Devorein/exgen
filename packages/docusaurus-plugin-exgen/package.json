@@ -1,7 +1,7 @@
 {
   "name": "docusaurus-plugin-exgen",
   "version": "0.0.1",
-  "description": "",
+  "description": "Docusaurus plugin to utilize @exgen/extractor and @exgen/embedder packages",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --sourceMap false --declaration false",
@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@exgen/extractor": "0.0.1",
-    "@exgen/generator": "0.0.1"
+    "@exgen/embedder": "0.0.1"
   }
 }

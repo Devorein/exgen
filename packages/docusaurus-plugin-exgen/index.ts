@@ -1,5 +1,5 @@
+import { embedExamples } from '@exgen/embedder';
 import { extractExamples } from '@exgen/extractor';
-import { generateExamples } from '@exgen/generator';
 import { join } from 'path';
 
 interface PluginOptions {
@@ -32,7 +32,7 @@ function exampleGenerator(_: any, opts: PluginOptions) {
 				);
 				const testFilesDirectory = join(packageDirectory, `${packageName}/tests`);
 				const functionExamplesRecord = await extractExamples(testFilesDirectory);
-				await generateExamples(
+				await embedExamples(
 					modulesMarkdownFilePath,
 					functionExamplesRecord,
 					`@${scope}/${packageName}`

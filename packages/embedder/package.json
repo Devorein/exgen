@@ -1,5 +1,5 @@
 {
-  "name": "@exgen/generator",
+  "name": "@exgen/embedder",
   "version": "0.0.1",
   "description": "Embed examples of your api in your markdown files",
   "main": "./dist/index.js",
