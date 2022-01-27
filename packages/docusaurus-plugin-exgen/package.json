@@ -3,14 +3,24 @@
   "version": "0.0.1",
   "description": "Docusaurus plugin to utilize @exgen/extractor and @exgen/embedder packages",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run build",
-    "build": "tsc --sourceMap false --declaration false",
+    "build": "tsc --sourceMap false",
     "build:watch": "tsc --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "docusaurus",
+    "typedoc",
+    "markdown",
+    "typescript",
+    "plugin"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "Safwan Shaheer <devorein00@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.9"
   },
@@ -20,5 +30,13 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devorein/exgen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Devorein/exgen/issues"
+  },
+  "homepage": "https://github.com/Devorein/exgen#readme"
 }
