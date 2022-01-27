@@ -19,6 +19,9 @@
     "ast",
     "unit-tests"
   ],
+  "files": [
+    "dist"
+  ],
   "author": "Safwan Shaheer <devorein00@gmail.com>",
   "license": "MIT",
   "peerDependencies": {

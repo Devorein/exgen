@@ -12,7 +12,7 @@ interface PluginOptions {
 
 function exampleGenerator(_: any, opts: PluginOptions) {
 	return {
-		name: 'docusaurus-plugin-example-generator',
+		name: 'docusaurus-plugin-exgen',
 
 		async loadContent() {
 			const {

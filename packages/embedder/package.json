@@ -18,6 +18,9 @@
     "markdown",
     "ast"
   ],
+  "files": [
+    "dist"
+  ],
   "author": "Safwan Shaheer <devorein00@gmail.com>",
   "license": "MIT",
   "dependencies": {
