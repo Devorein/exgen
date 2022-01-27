@@ -5,6 +5,7 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "prebuild": "del-cli ./dist",
     "build": "tsc --sourceMap false",
     "build:watch": "tsc -w",
@@ -37,5 +38,8 @@
   "bugs": {
     "url": "https://github.com/Devorein/exgen/issues"
   },
-  "homepage": "https://github.com/Devorein/exgen#readme"
+  "homepage": "https://github.com/Devorein/exgen#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

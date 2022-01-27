@@ -4,6 +4,7 @@
   "description": "Docusaurus plugin to utilize @exgen/extractor and @exgen/embedder packages",
   "main": "dist/index.js",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "tsc --sourceMap false --declaration false",
     "build:watch": "tsc --watch"
   },
@@ -16,5 +17,8 @@
   "dependencies": {
     "@exgen/extractor": "0.0.1",
     "@exgen/embedder": "0.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
