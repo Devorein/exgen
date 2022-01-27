@@ -1,10 +1,12 @@
 {
   "name": "exgen",
-  "version": "1.0.0",
   "description": "Generate examples of your api using pre-written tests",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/Devorein/fauton/blob/master/README.md",
+  "bugs": {
+    "url": "https://github.com/Devorein/fauton/issues"
+  },
   "scripts": {
+    "prebuild": "lerna run prebuild",
     "build": "lerna run build",
     "test": "lerna run test",
     "lint": "lerna run lint",
@@ -12,23 +14,32 @@
     "build:watch": "lerna run build:watch --parallel",
     "bootstrap": "lerna bootstrap"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Devorein/fauton.git"
+  },
+  "author": "Safwan Shaheer <devorein00@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "lerna": "^4.0.0",
-    "mdast-util-from-markdown": "0.8.5",
-    "mdast-util-frontmatter": "0.2.0",
-    "mdast-util-gfm-table": "0.1.6",
-    "mdast-util-to-markdown": "0.6.5",
-    "micromark-extension-frontmatter": "0.2.2",
-    "micromark-extension-gfm-table": "0.4.3",
     "typescript": "^4.5.4"
   },
   "devDependencies": {
-    "@types/node": "^17.0.8"
-  },
-  "engines": {
-    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+    "@types/node": "^17.0.8",
+    "@types/cli-progress": "^3.9.2",
+    "@types/jest": "^27.0.2",
+    "@types/shortid": "^0.0.29",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "del-cli": "^4.0.1",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.3.1",
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.7"
   }
 }

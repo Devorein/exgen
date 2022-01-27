@@ -1,6 +1,8 @@
-# `doc-example-generator`
+# `exgen`
 
 Easily generate examples for your api using existing unit tests.
+
+**NOTE**: Packages of this monorepo are still under heavy development. Use with caution.
 
 ## Motivation
 
