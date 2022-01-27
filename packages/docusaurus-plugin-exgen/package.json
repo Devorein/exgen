@@ -6,8 +6,13 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run build",
+    "prebuild": "del-cli ./dist",
     "build": "tsc --sourceMap false",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc -w",
+    "lint": "eslint \"./libs\" --ext tsx,ts",
+    "lint:fix": "eslint \"./libs\" --ext tsx,ts --fix",
+    "test": "jest --runInBand --config ./jest.config.js",
+    "format": "prettier ./libs/**/*.{ts,js} --write"
   },
   "keywords": [
     "docusaurus",
