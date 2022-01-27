@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/generator",
+  "name": "@exgen/generator",
   "version": "0.0.1",
   "description": "Embed examples of your api in your markdown files",
   "main": "./dist/index.js",
@@ -33,10 +33,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Devorein/xgen.git"
+    "url": "git+https://github.com/Devorein/exgen.git"
   },
   "bugs": {
-    "url": "https://github.com/Devorein/xgen/issues"
+    "url": "https://github.com/Devorein/exgen/issues"
   },
-  "homepage": "https://github.com/Devorein/xgen#readme"
+  "homepage": "https://github.com/Devorein/exgen#readme"
 }

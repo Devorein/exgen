@@ -1,5 +1,5 @@
 {
-  "name": "@xgen/extractor",
+  "name": "@exgen/extractor",
   "version": "0.0.1",
   "description": "Extract examples of how to consume your api by re-using pre-written unit tests",
   "types": "./dist/index.d.ts",
@@ -29,10 +29,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Devorein/xgen.git"
+    "url": "git+https://github.com/Devorein/exgen.git"
   },
   "bugs": {
-    "url": "https://github.com/Devorein/xgen/issues"
+    "url": "https://github.com/Devorein/exgen/issues"
   },
-  "homepage": "https://github.com/Devorein/xgen#readme"
+  "homepage": "https://github.com/Devorein/exgen#readme"
 }

@@ -100,7 +100,8 @@ export async function extractExamples(testFilesDirectory: string) {
 						if (statement.kind === 265) {
 							if (statement.importClause) {
 								const namedImports = statement.importClause.namedBindings as NamedImportBindings;
-								if (namedImports.kind === 268) {
+								// If its not a default import
+								if (namedImports?.kind === 268) {
 									const importSpecifiers = namedImports.elements;
 									importSpecifiers.forEach((importSpecifier) => {
 										importedFunctions.add(importSpecifier.name.escapedText as string);

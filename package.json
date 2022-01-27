@@ -1,5 +1,5 @@
 {
-  "name": "xgen",
+  "name": "exgen",
   "version": "1.0.0",
   "description": "Generate examples of your api using pre-written tests",
   "main": "./dist/index.js",

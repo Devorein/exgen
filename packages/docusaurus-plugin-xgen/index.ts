@@ -1,29 +1,36 @@
+import { extractExamples } from '@exgen/extractor';
+import { generateExamples } from '@exgen/generator';
 import { join } from 'path';
-import { extractExamples, generateExamples } from 'typedoc-example-generator';
 
 interface PluginOptions {
-  packageDirectory: string,
-  moduleMarkdownDirectory: string,
-  packages: string[],
-  scope: string
+	packageDirectory: string;
+	documentationDirectory: string;
+	packageModuleMarkdownDirectory?: string | null;
+	packages: string[];
+	scope: string;
 }
 
 function exampleGenerator(_: any, opts: PluginOptions) {
-  return {
+	return {
 		name: 'docusaurus-plugin-example-generator',
 
 		async loadContent() {
-			const { packages, scope, moduleMarkdownDirectory, packageDirectory } = opts;
+			const {
+				packages,
+				scope,
+				documentationDirectory,
+				packageModuleMarkdownDirectory,
+				packageDirectory,
+			} = opts;
 			for (let index = 0; index < packages.length; index++) {
 				const packageName = packages[index];
 				const modulesMarkdownFilePath = join(
-					moduleMarkdownDirectory,
-					`${packageName}/modules.md`
+					documentationDirectory,
+					`${packageName}/${
+						packageModuleMarkdownDirectory ? `${packageModuleMarkdownDirectory}/` : ''
+					}modules.md`
 				);
-				const testFilesDirectory = join(
-					packageDirectory,
-					`${packageName}/tests`
-				);
+				const testFilesDirectory = join(packageDirectory, `${packageName}/tests`);
 				const functionExamplesRecord = await extractExamples(testFilesDirectory);
 				await generateExamples(
 					modulesMarkdownFilePath,
