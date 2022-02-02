@@ -27,7 +27,8 @@
     "baseUrl": "./",
     "watch": false,
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "outDir": "./dist",
     "rootDir": "./libs"

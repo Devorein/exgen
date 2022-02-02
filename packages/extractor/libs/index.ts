@@ -14,11 +14,14 @@ export async function extractExamples(testFilesDirectory: string) {
   await traverseFiles(testFilesDirectory, (testFilePath) => {
     const program = ts.createProgram([testFilePath], {});
     const sourceFile = program.getSourceFile(testFilePath)!;
+    // A set to keep track of imported functions inside a test file
     const importedFunctions: Set<string> = new Set();
     for (let index = 0; index < sourceFile.statements.length; index++) {
       const statement = sourceFile.statements[index] as
         | ExpressionStatement
         | ImportDeclaration;
+      
+      // If the statement is an import clause
       if (statement.kind === 265) {
         if (statement.importClause) {
           const namedImports = statement.importClause.namedBindings as NamedImportBindings;
@@ -31,6 +34,7 @@ export async function extractExamples(testFilesDirectory: string) {
           }
         }
       } else {
+        // Find the function named describe
         const describeFunctionStatement = functionChecker(statement, 'describe');
         if (describeFunctionStatement) {
           argumentsChecker(
@@ -40,6 +44,7 @@ export async function extractExamples(testFilesDirectory: string) {
               // Make sure the function has been imported in the module
               if (importedFunctions.has(functionName)) {
                 const describeFunctionBlock = describeFunctionSecondArgument.body as Block;
+                // If we are inside a function block
                 if (describeFunctionBlock.kind === 234) {
                   // Loop through all the function block statements
                   for (
@@ -50,24 +55,31 @@ export async function extractExamples(testFilesDirectory: string) {
                     const describeFunctionBlockStatement = describeFunctionBlock.statements[
                       index
                     ] as ExpressionStatement;
+                    // Find the `it` function
                     const itFunctionStatement = functionChecker(
                       describeFunctionBlockStatement,
                       'it'
                     );
 
                     if (itFunctionStatement) {
-                      // Only if the first argument of it and describe are the same
+                      // Check the arguments of `it` function
                       argumentsChecker(
                         itFunctionStatement[0],
                         (itFunctionFirstArgument, itFunctionSecondArgument) => {
                           const exampleMessage = itFunctionFirstArgument.text;
+
                           const exampleInfo: ExampleInfo = {
+                            // Stores all the statements that has to be logged
                             logs: [],
+                            // Describes what the test is doing
                             message: exampleMessage,
+                            // Stores all the statements that is part of the it block
                             statements: [],
                           };
                           const itFunctionBlock = itFunctionSecondArgument.body as Block;
+                          // If we are inside a block
                           if (itFunctionBlock.kind === 234) {
+                            // Loop through all the statements of the block
                             for (
                               let index = 0;
                               index < itFunctionBlock.statements.length;
@@ -84,9 +96,11 @@ export async function extractExamples(testFilesDirectory: string) {
                                   'expect'
                                 );
                                 if (expectFunctionStatement) {
+                                  // Expected value would be the 2nd argument
                                   const expectedValue =
                                     expectFunctionStatement[0].arguments[0];
                                   exampleInfo.logs.push({
+                                    // print the node containing the expected value
                                     output: printer.printNode(
                                       ts.EmitHint.Unspecified,
                                       expectedValue,
@@ -101,6 +115,7 @@ export async function extractExamples(testFilesDirectory: string) {
                                     ),
                                   });
                                 } else {
+                                  // The rest function calls are statements
                                   exampleInfo.statements.push(
                                     printer.printNode(
                                       ts.EmitHint.Unspecified,
