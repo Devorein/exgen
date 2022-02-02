@@ -1,78 +1,12 @@
 import fs from 'fs/promises';
 import path from 'path';
 import ts, {
-	ArrowFunction,
-	Block,
-	CallExpression,
-	ExpressionStatement,
-	Identifier,
-	ImportDeclaration,
-	NamedImportBindings,
-	PropertyAccessExpression,
-	StringLiteral,
-	VariableDeclaration,
-	VariableDeclarationList,
-	VariableStatement,
+  Block, ExpressionStatement, ImportDeclaration,
+  NamedImportBindings
 } from 'typescript';
 import { ExampleInfo, FunctionExampleRecord } from './types';
-
-function functionChecker(expressionStatement: ExpressionStatement, functionName: string) {
-	function checker(functionCallExpressions: CallExpression[]): CallExpression[] | null {
-		const lastCallExpression = functionCallExpressions[functionCallExpressions.length - 1];
-
-		if (lastCallExpression.kind === 207) {
-			const identifier = lastCallExpression.expression as Identifier | PropertyAccessExpression;
-			if (identifier.kind === 79 && identifier.escapedText === functionName) {
-				return functionCallExpressions;
-			}
-			// For property access expression
-			else if (identifier.kind === 205) {
-				return checker(functionCallExpressions.concat(identifier.expression as CallExpression));
-			}
-		}
-		return null;
-	}
-
-	if (expressionStatement.kind === 237) {
-		const functionExpression = expressionStatement.expression as CallExpression;
-		return checker([functionExpression]);
-	}
-	return null;
-}
-
-// Check if the first argument is a string and second argument is an anonymous function expression
-function argumentsChecker(
-	callExpression: ts.CallExpression,
-	cb: (stringArgument: StringLiteral, arrowFunctionArgument: ArrowFunction) => void
-) {
-	const stringLiteral = callExpression.arguments[0] as StringLiteral;
-	if (stringLiteral.kind === 10 || stringLiteral.kind === 14) {
-		const arrowFunction = callExpression.arguments[1] as ArrowFunction;
-		if (arrowFunction.kind === 213) {
-			cb(stringLiteral, arrowFunction);
-		}
-	}
-}
-
-// Check if a variable is equal to the passed identifier
-export function variableChecker(
-	variableStatement: VariableStatement,
-	variableName: string,
-	cb: (initializer: ts.Expression) => void
-) {
-	if (variableStatement.kind === 236) {
-		const variableDeclarationList = variableStatement.declarationList as VariableDeclarationList;
-		if (variableDeclarationList.kind === 254) {
-			const variableDeclaration = variableDeclarationList.declarations[0] as VariableDeclaration;
-			if (variableDeclaration.kind === 253) {
-				const identifier = variableDeclaration.name as Identifier;
-				if (identifier.escapedText === variableName && variableDeclaration.initializer) {
-					cb(variableDeclaration.initializer);
-				}
-			}
-		}
-	}
-}
+import { argumentsChecker } from './utils/argumentsChecker';
+import { functionChecker } from './utils/functionChecker';
 
 export async function extractExamples(testFilesDirectory: string) {
 	const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
