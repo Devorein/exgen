@@ -1,10 +1,10 @@
 import ts, {
-  Block, ExpressionStatement, ImportDeclaration,
-  NamedImportBindings
+  Block, ExpressionStatement, ImportDeclaration
 } from 'typescript';
 import { ExampleInfo, FunctionExampleRecord } from './types';
 import { argumentsChecker } from './utils/argumentsChecker';
 import { functionChecker } from './utils/functionChecker';
+import { getNamedImportSpecifiers } from './utils/getNamedImportSpecifiers';
 import { traverseFiles } from './utils/traverseFiles';
 
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
@@ -12,7 +12,7 @@ const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 export function extractExamplesFromSourceFile(sourceFile: ts.SourceFile) {
   const functionExamplesRecord: FunctionExampleRecord = {};
   // A set to keep track of imported functions inside a test file
-  const importedFunctions: Set<string> = new Set();
+  let importedFunctions: Set<string> = new Set();
   for (let index = 0; index < sourceFile.statements.length; index++) {
     const statement = sourceFile.statements[index] as
       | ExpressionStatement
@@ -20,16 +20,7 @@ export function extractExamplesFromSourceFile(sourceFile: ts.SourceFile) {
     
     // If the statement is an import clause
     if (statement.kind === 265) {
-      if (statement.importClause) {
-        const namedImports = statement.importClause.namedBindings as NamedImportBindings;
-        // If its not a default import
-        if (namedImports?.kind === 268) {
-          const importSpecifiers = namedImports.elements;
-          importSpecifiers.forEach((importSpecifier) => {
-            importedFunctions.add(importSpecifier.name.escapedText as string);
-          });
-        }
-      }
+      importedFunctions = new Set([...importedFunctions, ...getNamedImportSpecifiers(statement)])
     } else {
       // Find the function named describe
       const describeFunctionStatement = functionChecker(statement, 'describe');
