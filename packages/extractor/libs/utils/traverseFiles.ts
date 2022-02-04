@@ -5,6 +5,7 @@ export async function traverseFiles(rootDirectory: string, cb: (filePath: string
   async function traverse(directory: string) {
 		const files = await fs.readdir(directory);
 		for (let index = 0; index < files.length; index++) {
+      
       const file = files[index];
       // Get the full file path
 			const filePath = path.join(directory, file);
