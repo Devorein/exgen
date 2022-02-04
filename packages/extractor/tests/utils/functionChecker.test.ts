@@ -3,14 +3,6 @@ import { ExpressionStatement } from "typescript";
 import { functionChecker } from "../../libs/utils/functionChecker";
 
 describe('functionChecker', () => {
-  it(`Return call expression if function is found`, async ()=> {
-    const project = await createProject({useInMemoryFileSystem: true});
-    const sourceFile = project.createSourceFile("main.ts", `desc("a", ()=>{});`);
-    const expressions = functionChecker(sourceFile.statements[0] as ExpressionStatement, "desc");
-
-    expect(expressions![0].kind).toStrictEqual(207);
-  })
-
   it(`Return call expressions array if function is found`, async ()=> {
     const project = await createProject({useInMemoryFileSystem: true});
     const sourceFile = project.createSourceFile("main.ts", `expect(1).toBe(2);`);

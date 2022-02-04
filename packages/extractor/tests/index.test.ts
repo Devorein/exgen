@@ -1,9 +1,40 @@
-import path from "node:path";
-import { extractExamples } from "../libs";
+import { createProject } from "@ts-morph/bootstrap";
+import { extractExamplesFromSourceFile } from "../libs";
 
-describe('extractExamples', () => {
+describe('extractExamplesFromSourceFile', () => {
   it(`Two it calls inside one describe call`, async () => {
-    expect(await extractExamples(path.join(__dirname, "examples"))).toStrictEqual({
+    const project = await createProject({useInMemoryFileSystem: true});
+    const sourceFile = project.createSourceFile("main.ts", `
+      import { makeDouble } from './libs/makeDouble';
+      import makeTriple from "./libs/makeTriple";
+      
+      // Needed to test for default import
+      makeTriple(2);
+      
+      function getArgument() {
+        return 1;
+      };
+      
+      describe('makeDouble', () => {
+        it("Convert 2 to double", () => {
+          let argument = getArgument();
+          argument+=1;
+          const doubled = makeDouble(argument);
+          expect(
+            doubled
+          ).toStrictEqual(4);
+        });
+      
+        it("Convert 1 to double", () => {
+          const doubled = makeDouble(1)
+          expect(
+            doubled
+          ).toStrictEqual(1);
+        });
+      });
+    `);
+    
+    expect(extractExamplesFromSourceFile(sourceFile)).toStrictEqual({
       makeDouble: [{
         logs: [{
           output: "4",
