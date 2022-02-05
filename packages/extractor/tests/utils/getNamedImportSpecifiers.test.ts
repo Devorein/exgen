@@ -3,7 +3,7 @@ import ts from "typescript";
 import { getNamedImportSpecifiers } from "../../libs/utils/getNamedImportSpecifiers";
 
 describe('getNamedImportSpecifiers', () => {
-  it(`Return named import specifiers from import declaration`, async ()=> {
+  it(`With named import specifiers`, async ()=> {
     const project = await createProject({useInMemoryFileSystem: true});
     const sourceFile = project.createSourceFile("main.ts", `import def, {a, b} from "../";`);
     const importedSpecifiers = getNamedImportSpecifiers(sourceFile.statements[0] as ts.ImportDeclaration)!;
