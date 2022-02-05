@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 describe('extractExamplesFromSourceFile', () => {
-  it(`Two it calls inside one describe call`, async () => {
+  it(`Call two it inside one describe call`, async () => {
     const {extractExamplesFromSourceFile} = await import("../../libs/utils/extractExamplesFromSourceFile");
     const project = await createProject({useInMemoryFileSystem: true});
     const sourceFile = project.createSourceFile("main.ts", `
