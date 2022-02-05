@@ -1,55 +1,69 @@
-import { createProject } from "@ts-morph/bootstrap";
-import { extractExamplesFromSourceFile } from "../libs";
 
-describe('extractExamplesFromSourceFile', () => {
-  it(`Two it calls inside one describe call`, async () => {
-    const project = await createProject({useInMemoryFileSystem: true});
-    const sourceFile = project.createSourceFile("main.ts", `
-      import { makeDouble } from './libs/makeDouble';
-      import makeTriple from "./libs/makeTriple";
-      
-      // Needed to test for default import
-      makeTriple(2);
-      
-      function getArgument() {
-        return 1;
-      };
-      
-      describe('makeDouble', () => {
-        it("Convert 2 to double", () => {
-          let argument = getArgument();
-          argument+=1;
-          const doubled = makeDouble(argument);
-          expect(
-            doubled
-          ).toStrictEqual(4);
-        });
-      
-        it("Convert 1 to double", () => {
-          const doubled = makeDouble(1)
-          expect(
-            doubled
-          ).toStrictEqual(1);
-        });
-      });
-    `);
+afterEach(() => {
+  jest.resetModules();
+  jest.restoreAllMocks();
+  jest.resetAllMocks();
+});
+
+describe('extractExamples', () => {
+  it(`Extract examples from source files`, async ()=> {
+    const traverseFilesMock = jest.fn();
+    // Call the cb twice to simulate test files inside nested directories 
+    traverseFilesMock.mockImplementationOnce((_, cb) => {
+      cb("root/file1.test.ts")
+      cb("root/dir/file2.test.ts")
+    });
+
+    jest.mock("../libs/utils/traverseFiles", () => ({
+      traverseFiles: traverseFilesMock
+    }));
+
+    const extractExamplesFromSourceFileMock = jest.fn();
+    extractExamplesFromSourceFileMock.mockImplementationOnce(() => ({
+      makeDouble: {
+        a: 1,
+        b: 1
+      }
+    })).mockImplementationOnce(() => ({
+      makeTriple: {
+        c: 1,
+        d: 2
+      }
+    }));
+    jest.mock("../libs/utils/extractExamplesFromSourceFile", () => ({
+      extractExamplesFromSourceFile: extractExamplesFromSourceFileMock
+    }))
+
+    const createProgramMock = jest.fn();
+    const getSourceFileMock = jest.fn();
+    getSourceFileMock.mockImplementation(() => "sourcefile");
+    createProgramMock.mockImplementation(() => ({
+      getSourceFile: getSourceFileMock
+    }));
+
+    jest.mock("typescript", () => ({
+      createProgram: createProgramMock
+    }))
+
+    const {extractExamples} = await import("../libs/index");
+
+    const functionExamplesRecord = await extractExamples("root");
     
-    expect(extractExamplesFromSourceFile(sourceFile)).toStrictEqual({
-      makeDouble: [{
-        logs: [{
-          output: "4",
-          arg: "doubled"
-        }],
-        message: "Convert 2 to double",
-        statements: ["let argument = getArgument();", "argument += 1;", "const doubled = makeDouble(argument);"]
-      }, {
-        logs: [{
-          output: "1",
-          arg: "doubled"
-        }],
-        message: "Convert 1 to double",
-        statements: ["const doubled = makeDouble(1);"]
-      }]
-    })
-  })
+    expect(getSourceFileMock.mock.calls[0][0]).toBe("root/file1.test.ts")
+    expect(getSourceFileMock.mock.calls[1][0]).toBe("root/dir/file2.test.ts")
+    expect(createProgramMock.mock.calls[0][0][0]).toEqual("root/file1.test.ts");
+    expect(createProgramMock.mock.calls[1][0][0]).toEqual("root/dir/file2.test.ts");
+    expect(functionExamplesRecord).toStrictEqual({
+      "makeDouble": {
+        a: 1,
+        b: 1
+      },
+      "makeTriple": {
+        c: 1,
+        d: 2
+      }
+    });
+    expect(extractExamplesFromSourceFileMock.mock.calls[0][0]).toBe("sourcefile")
+    expect(extractExamplesFromSourceFileMock.mock.calls[1][0]).toBe("sourcefile")
+  });
 });

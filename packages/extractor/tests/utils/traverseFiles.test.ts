@@ -21,6 +21,9 @@ describe('traverseFiles', () => {
     } as any);
 
     await traverseFiles("root", mockFn);
-    expect(mockFn.mock.calls).toEqual([[path.join("root", "dir", "file2.test.ts")], [path.join("root", "file1.test.ts")]])
+    expect(mockFn.mock.calls).toEqual([[path.join("root", "dir", "file2.test.ts")], [path.join("root", "file1.test.ts")]]);
+    jest.resetModules();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
   });
 });
