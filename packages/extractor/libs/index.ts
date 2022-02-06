@@ -3,7 +3,7 @@ import { FunctionExampleRecord } from './types';
 import { extractExamplesFromSourceFile } from './utils/extractExamplesFromSourceFile';
 import { traverseFiles } from './utils/traverseFiles';
 
-export async function extractExamples(testFilesDirectory: string) {
+export default async function extractExamples(testFilesDirectory: string) {
 	let functionExamplesRecord: FunctionExampleRecord = {};
   await traverseFiles(testFilesDirectory, (testFilePath) => {
     const program = ts.createProgram([testFilePath], {});

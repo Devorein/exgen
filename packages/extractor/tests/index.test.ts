@@ -45,9 +45,9 @@ describe('extractExamples', () => {
       createProgram: createProgramMock
     }))
 
-    const {extractExamples} = await import("../libs/index");
+    const extractExamples = await import("../libs/index");
 
-    const functionExamplesRecord = await extractExamples("root");
+    const functionExamplesRecord = await extractExamples.default("root");
     
     expect(getSourceFileMock.mock.calls[0][0]).toBe("root/file1.test.ts")
     expect(getSourceFileMock.mock.calls[1][0]).toBe("root/dir/file2.test.ts")

@@ -17,7 +17,7 @@ export async function traverseFiles(rootDirectory: string, cb: (filePath: string
       }
       // Checking whether its a test file 
       else {
-        if (file.includes("test.ts")) {
+        if (file.endsWith("test.ts") || file.endsWith("test.js")) {
           cb(filePath)
         }
       }
